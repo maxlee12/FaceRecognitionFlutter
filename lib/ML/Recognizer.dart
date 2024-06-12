@@ -123,8 +123,11 @@ class Recognizer {
         double diff = emb[i] - knownEmb[i];
         distance += diff*diff;
       }
+      // print("nowDistance:${pair.distance} distance from name:$name $distance");
+      // 阈值
+      double limit = 0.4;
       distance = sqrt(distance);
-      if (pair.distance == -5 || distance < pair.distance) {
+      if (pair.distance == -5 || (distance < pair.distance && distance < limit)) {
         pair.distance = distance;
         pair.name = name;
       }

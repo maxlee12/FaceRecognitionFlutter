@@ -15,7 +15,6 @@ import 'ML/Recognition.dart';
 import 'ML/Recognition.dart';
 import 'ML/Recognition.dart';
 import 'ML/Recognizer.dart';
-import 'TE/test.dart';
 
 
 late List<CameraDescription> cameras;
@@ -28,13 +27,7 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // return MaterialApp(
-    //   home: MyTeHomePage(
-    //     cameras: cameras,
-    //   ),
-    // );
-
-    return const MaterialApp(
+    return MaterialApp(
       home: MyHomePage(
       ),
     );
@@ -42,7 +35,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+  MyHomePage({Key? key}) : super(key: key);
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -51,7 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
   //dynamic controller;
   bool isBusy = false;
   late Size size;
-  late CameraDescription description = cameras[1];
+  late CameraDescription description = cameras[0];
   CameraLensDirection camDirec = CameraLensDirection.front;
   late List<Recognition> recognitions = [];
 
@@ -73,7 +66,7 @@ late Recognizer _recognizer;
     //TODO initialize face recognizer
       _recognizer=Recognizer();
     //TODO initialize camera footage
-    initCamera(cameras[0]);
+    initCamera(cameras![0]);
   }
   Future initCamera(CameraDescription cameraDescription) async {
 // create a CameraController
@@ -100,7 +93,7 @@ late Recognizer _recognizer;
                 .asUint8List();
             final Size imageSize = Size(
                 cameraImage!.width.toDouble(), cameraImage!.height.toDouble());
-            final camera = cameras[0];
+            final camera = cameras![0];
             final imageRotation = InputImageRotationValue.fromRawValue(
                 camera.sensorOrientation);
             // if (imageRotation == null) return;
@@ -283,28 +276,27 @@ late Recognizer _recognizer;
   img.Image convertYUV420ToImage(CameraImage cameraImage) {
     final width = cameraImage.width;
     final height = cameraImage.height;
+
+    final yRowStride = cameraImage.planes[0].bytesPerRow;
+    final uvRowStride = cameraImage.planes[1].bytesPerRow;
+    final uvPixelStride = cameraImage.planes[1].bytesPerPixel!;
+
     final image = img.Image(width:width, height:height);
 
-    if(cameraImage.planes.length >1){
-      final yRowStride = cameraImage.planes[0].bytesPerRow;
-      final uvRowStride = cameraImage.planes[1].bytesPerRow;
-      final uvPixelStride = cameraImage.planes[1].bytesPerPixel!;
-      for (var w = 0; w < width; w++) {
-        for (var h = 0; h < height; h++) {
-          final uvIndex =
-              uvPixelStride * (w / 2).floor() + uvRowStride * (h / 2).floor();
-          final index = h * width + w;
-          final yIndex = h * yRowStride + w;
+    for (var w = 0; w < width; w++) {
+      for (var h = 0; h < height; h++) {
+        final uvIndex =
+            uvPixelStride * (w / 2).floor() + uvRowStride * (h / 2).floor();
+        final index = h * width + w;
+        final yIndex = h * yRowStride + w;
 
-          final y = cameraImage.planes[0].bytes[yIndex];
-          final u = cameraImage.planes[1].bytes[uvIndex];
-          final v = cameraImage.planes[2].bytes[uvIndex];
+        final y = cameraImage.planes[0].bytes[yIndex];
+        final u = cameraImage.planes[1].bytes[uvIndex];
+        final v = cameraImage.planes[2].bytes[uvIndex];
 
-          image.data!.setPixelR(w, h, yuv2rgb(y, u, v));//= yuv2rgb(y, u, v);
-        }
+        image.data!.setPixelR(w, h, yuv2rgb(y, u, v));//= yuv2rgb(y, u, v);
       }
     }
-
     return image;
   }
   int yuv2rgb(int y, int u, int v) {
@@ -407,7 +399,7 @@ late Recognizer _recognizer;
   void _toggleCameraDirection() async {
     if (camDirec == CameraLensDirection.back) {
       camDirec = CameraLensDirection.front;
-      description = cameras[1];
+      description = cameras[0];
     } else {
       camDirec = CameraLensDirection.back;
       description = cameras[0];
