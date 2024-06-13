@@ -83,6 +83,8 @@ late Recognizer _recognizer;
             cameraImage=image;
             print("object"+cameraImage!.format.toString());
 
+            final time1 = DateTime.now().millisecondsSinceEpoch;
+
             final WriteBuffer allBytes = WriteBuffer();
             for (final Plane plane in cameraImage!.planes) {
               allBytes.putUint8List(plane.bytes);
@@ -122,12 +124,20 @@ late Recognizer _recognizer;
             final inputImage = InputImage.fromBytes(
                 bytes: bytes, inputImageData: inputImageData);
 
+            final time2 = DateTime.now().millisecondsSinceEpoch;
+
             List<Face> cropImage = await detector.processImage(inputImage);
+
+            final time3 = DateTime.now().millisecondsSinceEpoch;
+
             for(Face face in cropImage)
             {
               print("count=${(face.boundingBox.toString())}");
             }
             performFaceRecognition(cropImage);
+            final time4 = DateTime.now().millisecondsSinceEpoch;
+
+            print("data time:${time2-time1} processImage time:${time3-time2} Recognition time:${time4-time3}");
 
             // setState(() {
             //  _scanResults = cropImage;
@@ -369,7 +379,6 @@ late Recognizer _recognizer;
     for (Face face in faces) {
       print(face.boundingBox.toString() + "gghdhdh");
     }
-
     performFaceRecognition(faces);
     // setState(() {
     //   _scanResults=faces;

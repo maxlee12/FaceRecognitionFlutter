@@ -7,7 +7,7 @@ import '../DB/DatabaseHelper.dart';
 import 'Recognition.dart';
 
 class Recognizer {
-  late Interpreter interpreter;
+  Interpreter? interpreter;
   late InterpreterOptions _interpreterOptions;
   static const int WIDTH = 112;
   static const int HEIGHT = 112;
@@ -94,11 +94,11 @@ class Recognizer {
     print(input.shape.toString());
 
     //TODO output array
-    List output = List.filled(1*192, 0).reshape([1,192]);
+    List output = List.filled(1*192, 0.0).reshape([1,192]);
 
     //TODO performs inference
     final runs = DateTime.now().millisecondsSinceEpoch;
-    interpreter.run(input, output);
+    interpreter?.run(input, output);
     final run = DateTime.now().millisecondsSinceEpoch - runs;
     print('Time to run inference: $run ms$output');
 
@@ -136,7 +136,7 @@ class Recognizer {
   }
 
   void close() {
-    interpreter.close();
+    interpreter?.close();
   }
 
 }
