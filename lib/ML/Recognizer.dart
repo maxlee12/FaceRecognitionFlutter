@@ -8,6 +8,7 @@ import 'Recognition.dart';
 
 class Recognizer {
   Interpreter? interpreter;
+  IsolateInterpreter? isolateInterpreter;
   late InterpreterOptions _interpreterOptions;
   static const int WIDTH = 112;
   static const int HEIGHT = 112;
@@ -42,7 +43,7 @@ class Recognizer {
       List<double> embd = row[DatabaseHelper.columnEmbedding].split(',').map((e) => double.parse(e)).toList().cast<double>();
       Recognition recognition = Recognition(row[DatabaseHelper.columnName],Rect.zero,embd,0);
       registered.putIfAbsent(name, () => recognition);
-      print("R="+name);
+      print("loadRegisteredFaces name:$name");
     }
   }
 
@@ -63,6 +64,7 @@ class Recognizer {
   Future<void> loadModel() async {
     try {
       interpreter = await Interpreter.fromAsset(modelName);
+      isolateInterpreter  = await IsolateInterpreter.create(address: interpreter!.address);
     } catch (e) {
       print('Unable to create interpreter, Caught Exception: ${e.toString()}');
     }
@@ -94,13 +96,13 @@ class Recognizer {
     print(input.shape.toString());
 
     //TODO output array
-    List output = List.filled(1*192, 0.0).reshape([1,192]);
+    List output = List.filled(1*192, 0).reshape([1,192]);
 
     //TODO performs inference
     final runs = DateTime.now().millisecondsSinceEpoch;
     interpreter?.run(input, output);
     final run = DateTime.now().millisecondsSinceEpoch - runs;
-    print('Time to run inference: $run ms$output');
+    print('recognizeTime: $run');
 
     //TODO convert dynamic list to double list
      List<double> outputArray = output.first.cast<double>();
@@ -120,16 +122,19 @@ class Recognizer {
       List<double> knownEmb = item.value.embeddings;
       double distance = 0;
       for (int i = 0; i < emb.length; i++) {
+        print("emb.type:${emb[i].runtimeType}");
         double diff = emb[i] - knownEmb[i];
         distance += diff*diff;
       }
-      // print("nowDistance:${pair.distance} distance from name:$name $distance");
       // 阈值
-      double limit = 0.4;
       distance = sqrt(distance);
-      if (pair.distance == -5 || (distance < pair.distance && distance < limit)) {
+      print("nowDistance:${pair.distance} distance from name:$name $distance");
+
+      if (pair.distance == -5 || distance < pair.distance) {
         pair.distance = distance;
-        pair.name = name;
+        if(distance <0.8){
+          pair.name = name;
+        }
       }
     }
     return pair;
