@@ -1,17 +1,11 @@
-# realtime_face_recognition
+### 使用google_mlkit_face_detection和tflite_flutter 做人脸识别
+### 原始项目地址：https://github.com/shivani91jm/2024RealtimeFaceRecognitionFlutter
 
-A new Flutter project.
+### 类似实现：https://github.com/estebanuri/face_recognition
 
-## Getting Started
+### 活体检测：https://github.com/aitsuki/LivenessDetectionSample
 
-This project is a starting point for a Flutter application.
+### 模型训练：https://github.com/sirius-ai/MobileFaceNet_TF
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# FaceRecognitionFlutter
